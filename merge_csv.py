@@ -1,8 +1,13 @@
+# ==============================
+# 1. ライブラリ読み込み
+# ==============================
 import pandas as pd
 from pathlib import Path
 import sqlite3
 
-# CSVが置いてあるディレクトリを明示する
+# ==============================
+# 2. CSVファイル読み込み
+# ==============================
 data_dir = Path("data")
 db_path = "work_data.db"
 conn = sqlite3.connect(db_path)
@@ -24,6 +29,9 @@ else:
 
 all_data = pd.concat(df_list, ignore_index=True)
 
+# ==============================
+# 3. SQLiteへ保存
+# ==============================
 all_data.to_sql(
     "work_records",
     conn,
@@ -35,6 +43,10 @@ print("データベースに保存しました。")
 check_df = pd.read_sql("SELECT * FROM work_records LIMIT 5;", conn)
 print(check_df)
 
+# ==============================
+# 4. SQLで集計
+# ==============================
+# （件数・合計金額）
 sql_count = """
 SELECT
     担当者,
@@ -57,6 +69,10 @@ ORDER BY 合計金額 DESC;
 
 sum_df = pd.read_sql(sql_sum, conn)
 
+# ==============================
+# 5. 結果出力
+# ==============================
+# （CSV出力）
 count_df.to_csv("担当者別_件数.csv", index=False, encoding="utf-8-sig")
 sum_df.to_csv("担当者別_合計金額.csv", index=False, encoding="utf-8-sig")
 
